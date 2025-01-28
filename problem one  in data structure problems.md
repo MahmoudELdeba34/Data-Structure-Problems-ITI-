@@ -51,11 +51,4 @@ The **Employee Management System** is a C++ program that:
 4. The program sorts the employees based on their IDs using the selected algorithm.
 5. The sorted list of employees is displayed.
 
----
 
-## How to Use
-
-1. Clone the repository or download the source code.
-2. Compile the program using a C++ compiler (e.g., `g++`):
-   ```bash
-   g++ main.cpp -o EmployeeManagementSystem
