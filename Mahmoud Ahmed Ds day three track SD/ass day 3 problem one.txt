@@ -1,0 +1,121 @@
+#include <iostream>
+using namespace std;
+
+// Node structure (تكوين النود)
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+
+    Node(int val) : data(val), prev(nullptr), next(nullptr) {}
+};
+
+// Function to delete a node from the doubly linked list(للحذف)
+void deleteNode(Node*& head, Node*& tail, int value) {
+    if (!head) {
+        cout << "The list is empty!" << endl;
+        return;
+    }
+
+    Node* current = head;
+
+    // Search for the node containing the value
+    while (current && current->data != value) {
+        current = current->next;
+    }
+
+    // If the node is not found
+    if (!current) {
+        cout << "Node with value " << value << " not found!" << endl;
+        return;
+    }
+
+    // Delete the node based on its position(حذف )
+    if (head == current) {
+        head = current->next;
+        if (head) head->prev = nullptr;
+        else tail = nullptr; // If the list becomes empty
+    } else if (tail == current) {
+        tail = current->prev;
+        if (tail) tail->next = nullptr;
+    } else {
+        Node* prevNode = current->prev;
+        Node* nextNode = current->next;
+        if (prevNode) prevNode->next = nextNode;
+        if (nextNode) nextNode->prev = prevNode;
+    }
+
+    delete current;
+    cout << "Node with value " << value << " has been deleted." << endl;
+}
+
+// Function to print the doubly linked list(طباعه )
+void printList(Node* head) {
+    if (!head) {
+        cout << "The list is empty!" << endl;
+        return;
+    }
+
+    Node* temp = head;
+    while (temp) {
+        cout << temp->data << " ";
+        temp = temp->next;
+    }
+    cout << endl;
+}
+
+// Function to add a node at the end of the list(لاضاف نود)
+void append(Node*& head, Node*& tail, int data) {
+    Node* newNode = new Node(data);
+    if (!head) {
+        head = tail = newNode;
+    } else {
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
+    }
+}
+
+int main() {
+    Node* head = nullptr;
+    Node* tail = nullptr;
+
+    int choice, value;
+
+    do {
+        cout << "\n1. Add a value to the list";
+        cout << "\n2. Delete a node by value";
+        cout << "\n3. Display the list";
+        cout << "\n4. Exit the program";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter the value to add: ";
+                cin >> value;
+                append(head, tail, value);
+                break;
+
+            case 2:
+                cout << "Enter the value to delete: ";
+                cin >> value;
+                deleteNode(head, tail, value);
+                break;
+
+            case 3:
+                cout << "List contents: ";
+                printList(head);
+                break;
+
+            case 4:
+                cout << "Exiting the program..." << endl;
+                break;
+
+            default:
+                cout << "Invalid choice! Please try again." << endl;
+        }
+    } while (choice != 4);
+
+    return 0;
+}

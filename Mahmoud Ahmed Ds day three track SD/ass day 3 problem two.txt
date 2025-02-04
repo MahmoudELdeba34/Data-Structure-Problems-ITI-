@@ -1,0 +1,283 @@
+#include <iostream>
+using namespace std;
+
+// Node structure
+struct Node {
+    int data;
+    Node* prev;
+    Node* next;
+
+    Node(int val) : data(val), prev(nullptr), next(nullptr) {}
+};
+
+// Function to add a node at the end of the list
+void append(Node*& head, Node*& tail, int data) {
+    Node* newNode = new Node(data);
+    if (!head) {
+        head = tail = newNode;
+    } else {
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
+    }
+}
+
+// Function to print the doubly linked list
+void printList(Node* head) {
+    if (!head) {
+        cout << "The list is empty!" << endl;
+        return;
+    }
+
+    Node* temp = head;
+    while (temp) {
+        cout << temp->data << " ";
+        temp = temp->next;
+    }
+    cout << endl;
+}
+
+// Bubble Sort function
+void bubbleSort(Node* head) {
+    if (!head) return;
+
+    bool swapped;
+    Node* current;
+    Node* last = nullptr;
+
+    do {
+        swapped = false;
+        current = head;
+
+        while (current->next != last) {
+            if (current->data > current->next->data) {
+                int temp = current->data;
+                current->data = current->next->data;
+                current->next->data = temp;
+
+                swapped = true;
+            }
+            current = current->next;
+        }
+
+        last = current;
+    } while (swapped);
+    cout << "List sorted using Bubble Sort." << endl;
+}
+
+// Insertion Sort function
+void insertionSort(Node*& head) {
+    if (!head || !head->next) return;
+
+    Node* current = head->next;
+    while (current) {
+        int key = current->data;
+        Node* temp = current->prev;
+
+        while (temp && temp->data > key) {
+            temp->next->data = temp->data;
+            temp = temp->prev;
+        }
+
+        if (temp) {
+            temp->next->data = key;
+        } else {
+            head->data = key;
+        }
+
+        current = current->next;
+    }
+    cout << "List sorted using Insertion Sort." << endl;
+}
+
+// Selection Sort function
+void selectionSort(Node* head) {
+    if (!head) return;
+
+    Node* current = head;
+    while (current) {
+        Node* minNode = current;
+        Node* nextNode = current->next;
+
+        while (nextNode) {
+            if (nextNode->data < minNode->data) {
+                minNode = nextNode;
+            }
+            nextNode = nextNode->next;
+        }
+
+        if (minNode != current) {
+            int temp = current->data;
+            current->data = minNode->data;
+            minNode->data = temp;
+        }
+
+        current = current->next;
+    }
+    cout << "List sorted using Selection Sort." << endl;
+}
+
+// Function to delete a node by value
+void deleteNode(Node*& head, Node*& tail, int value) {
+    if (!head) {
+        cout << "The list is empty!" << endl;
+        return;
+    }
+
+    Node* current = head;
+
+    while (current && current->data != value) {
+        current = current->next;
+    }
+
+    if (!current) {
+        cout << "Value " << value << " not found in the list!" << endl;
+        return;
+    }
+
+    if (current == head) {
+        head = head->next;
+        if (head) head->prev = nullptr;
+    } else if (current == tail) {
+        tail = tail->prev;
+        if (tail) tail->next = nullptr;
+    } else {
+        current->prev->next = current->next;
+        current->next->prev = current->prev;
+    }
+
+    delete current;
+    cout << "Node with value " << value << " deleted from the list." << endl;
+}
+
+// Sequential Search
+bool sequentialSearch(Node* head, int value) {
+    Node* temp = head;
+    while (temp) {
+        if (temp->data == value) {
+            return true;
+        }
+        temp = temp->next;
+    }
+    return false;
+}
+
+// Binary Search
+bool binarySearch(Node* head, int value) {
+    if (!head) return false;
+
+    Node* start = head;
+    Node* end = nullptr;
+
+    do {
+        Node* mid = start;
+        Node* temp = start;
+
+        while (temp != end) {
+            temp = temp->next;
+            if (temp != end) mid = mid->next;
+        }
+
+        if (mid->data == value) return true;
+        if (mid->data > value) end = mid;
+        else start = mid->next;
+    } while (end == nullptr || start != end);
+
+    return false;
+}
+
+int main() {
+    Node* head = nullptr;
+    Node* tail = nullptr;
+
+    int choice, value;
+
+    do {
+        cout << "\n1. Add a value to the list";
+        cout << "\n2. Sort the list";
+        cout << "\n3. Search for a value";
+        cout << "\n4. Delete a node by value";
+        cout << "\n5. Display the list";
+        cout << "\n6. Exit the program";
+        cout << "\nEnter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter the value to add: ";
+                cin >> value;
+                append(head, tail, value);
+                break;
+
+            case 2: {
+                int sortType;
+                cout << "Choose sort type: 1. Bubble Sort  2. Insertion Sort  3. Selection Sort\n";
+                cin >> sortType;
+
+                if (sortType == 1) {
+                    bubbleSort(head);
+                } else if (sortType == 2) {
+                    insertionSort(head);
+                } else if (sortType == 3) {
+                    selectionSort(head);
+                } else {
+                    cout << "Invalid sort type!" << endl;
+                }
+
+                char displayChoice;
+                cout << "Do you want to display the sorted list? (y/n): ";
+                cin >> displayChoice;
+
+                if (displayChoice == 'y' || displayChoice == 'Y') {
+                    printList(head);
+                }
+                break;
+            }
+
+            case 3: {
+                int searchType;
+                cout << "Choose search type: 1. Sequential Search  2. Binary Search\n";
+                cin >> searchType;
+
+                cout << "Enter the value to search for: ";
+                cin >> value;
+
+                if (searchType == 1) {
+                    if (sequentialSearch(head, value))
+                        cout << "Value found using Sequential Search." << endl;
+                    else
+                        cout << "Value not found." << endl;
+                } else if (searchType == 2) {
+                    bubbleSort(head); // Ensure the list is sorted for Binary Search
+                    if (binarySearch(head, value))
+                        cout << "Value found using Binary Search." << endl;
+                    else
+                        cout << "Value not found." << endl;
+                } else {
+                    cout << "Invalid search type!" << endl;
+                }
+                break;
+            }
+
+            case 4:
+                cout << "Enter the value to delete: ";
+                cin >> value;
+                deleteNode(head, tail, value);
+                break;
+
+            case 5:
+                cout << "List contents: ";
+                printList(head);
+                break;
+
+            case 6:
+                cout << "Exiting the program..." << endl;
+                break;
+
+            default:
+                cout << "Invalid choice! Please try again." << endl;
+        }
+    } while (choice != 6);
+
+    return 0;
+}
