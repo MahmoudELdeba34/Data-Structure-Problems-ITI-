@@ -1,0 +1,128 @@
+#include <iostream>
+using namespace std;
+
+// Node structure for the queue
+struct Node {
+    int data;
+    Node* next;
+
+    Node(int value) : data(value), next(nullptr) {}
+};
+
+// Queue class
+class Queue {
+private:
+    Node* front; // Pointer to the front of the queue
+    Node* rear;  // Pointer to the rear of the queue
+
+public:
+    Queue() : front(nullptr), rear(nullptr) {} // Constructor to initialize the queue
+
+    // Enqueue operation (add an element to the rear)
+    void enqueue(int value) {
+        Node* newNode = new Node(value);
+        if (rear == nullptr) { // If the queue is empty
+            front = rear = newNode;
+        } else {
+            rear->next = newNode;
+            rear = newNode;
+        }
+        cout << value << " enqueued into the queue." << endl;
+    }
+
+    // Dequeue operation (remove an element from the front)
+    void dequeue() {
+        if (front == nullptr) { // If the queue is empty
+            cout << "Queue is empty. Cannot perform dequeue operation." << endl;
+            return;
+        }
+
+        Node* temp = front;
+        front = front->next;
+
+        if (front == nullptr) { // If the queue becomes empty
+            rear = nullptr;
+        }
+
+        cout << temp->data << " dequeued from the queue." << endl;
+        delete temp; // Free memory
+    }
+
+    // Peek operation (get the front element without removing it)
+    int peek() {
+        if (front == nullptr) { // If the queue is empty
+            cout << "Queue is empty." << endl;
+            return -1; // Return -1 as an error value
+        }
+        return front->data;
+    }
+
+    // Check if the queue is empty
+    bool isEmpty() {
+        return front == nullptr;
+    }
+
+    // Print the queue
+    void printQueue() {
+        if (front == nullptr) {
+            cout << "Queue is empty." << endl;
+            return;
+        }
+        Node* temp = front;
+        cout << "Queue elements: ";
+        while (temp != nullptr) {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+        cout << endl;
+    }
+};
+
+// Main program
+int main() {
+    Queue queue;
+
+    int choice, value;
+    while (true) {
+        cout << "\nChoose an operation:\n";
+        cout << "1. Enqueue\n";
+        cout << "2. Dequeue\n";
+        cout << "3. Peek\n";
+        cout << "4. Check if queue is empty\n";
+        cout << "5. Print queue\n";
+        cout << "6. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter value to enqueue: ";
+                cin >> value;
+                queue.enqueue(value);
+                break;
+            case 2:
+                queue.dequeue();
+                break;
+            case 3:
+                cout << "Front element is: " << queue.peek() << endl;
+                break;
+            case 4:
+                if (queue.isEmpty()) {
+                    cout << "Queue is empty." << endl;
+                } else {
+                    cout << "Queue is not empty." << endl;
+                }
+                break;
+            case 5:
+                queue.printQueue();
+                break;
+            case 6:
+                cout << "Exiting the program." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice! Please try again." << endl;
+        }
+    }
+
+    return 0;
+}
