@@ -1,0 +1,304 @@
+#include <iostream>
+#include <string>
+#include <climits>
+using namespace std;
+
+// Employee Node
+struct Node {
+    int emp_id;
+    string name;
+    int age;
+    double salary;
+    Node* left;
+    Node* right;
+
+    Node(int id, string n, int a, double s)
+        : emp_id(id), name(n), age(a), salary(s), left(nullptr), right(nullptr) {}
+};
+
+// Employee Tree Class
+class EmployeeTree {
+private:
+    Node* root;
+
+    // Insert Helper
+    Node* insertNode(Node* root, int id, string name, int age, double salary) {
+        if (!root)
+            return new Node(id, name, age, salary);
+
+        if (id < root->emp_id)
+            root->left = insertNode(root->left, id, name, age, salary);
+        else
+            root->right = insertNode(root->right, id, name, age, salary);
+
+        return root;
+    }
+
+    // Search Helper
+    Node* searchNode(Node* root, int id) {
+        if (!root || root->emp_id == id)
+            return root;
+
+        if (id < root->emp_id)
+            return searchNode(root->left, id);
+        else
+            return searchNode(root->right, id);
+    }
+
+    // Update Helper
+    void updateNode(Node* root, int id, string name, int age, double salary) {
+        Node* node = searchNode(root, id);
+        if (node) {
+            node->name = name;
+            node->age = age;
+            node->salary = salary;
+            cout << "Employee updated successfully.\n";
+        } else {
+            cout << "Employee not found.\n";
+        }
+    }
+
+    // Delete Helper
+    Node* deleteNode(Node* root, int id, int caseType) {
+        if (!root) return root;
+
+        if (id < root->emp_id)
+            root->left = deleteNode(root->left, id, caseType);
+        else if (id > root->emp_id)
+            root->right = deleteNode(root->right, id, caseType);
+        else {
+            if (caseType == 1) {  // Case 1: Leaf Node
+                delete root;
+                return nullptr;
+            } else if (caseType == 2) {  // Case 2: One Subtree
+                Node* temp = root->left ? root->left : root->right;
+                delete root;
+                return temp;
+            } else {  // Case 3: Two Subtrees
+                Node* temp = findMin(root->right);
+                root->emp_id = temp->emp_id;
+                root->name = temp->name;
+                root->age = temp->age;
+                root->salary = temp->salary;
+                root->right = deleteNode(root->right, temp->emp_id, caseType);
+            }
+        }
+        return root;
+    }
+
+    Node* findMin(Node* root) {
+        while (root && root->left)
+            root = root->left;
+        return root;
+    }
+
+    // Height Helper
+    int height(Node* root) {
+        if (!root) return 0;
+        return 1 + max(height(root->left), height(root->right));
+    }
+
+    // Depth Helper
+    int depth(Node* root, int id, int currentDepth) {
+        if (!root) return -1;
+        if (root->emp_id == id) return currentDepth;
+
+        if (id < root->emp_id)
+            return depth(root->left, id, currentDepth + 1);
+        else
+            return depth(root->right, id, currentDepth + 1);
+    }
+
+    // Count Leaves Helper
+    int countLeaves(Node* root) {
+        if (!root) return 0;
+        if (!root->left && !root->right) return 1;
+        return countLeaves(root->left) + countLeaves(root->right);
+    }
+
+    // Find Largest Leaf
+    Node* findLargestLeaf(Node* root) {
+        while (root && root->right)
+            root = root->right;
+        return root;
+    }
+
+    // Find Smallest Leaf
+    Node* findSmallestLeaf(Node* root) {
+        while (root && root->left)
+            root = root->left;
+        return root;
+    }
+
+    // Inorder Traversal Helper
+    void inorder(Node* root) {
+        if (!root) return;
+        inorder(root->left);
+        cout << "ID: " << root->emp_id << ", Name: " << root->name
+             << ", Age: " << root->age << ", Salary: " << root->salary << endl;
+        inorder(root->right);
+    }
+
+public:
+    EmployeeTree() : root(nullptr) {}
+
+    // Insert Employee
+    void insert(int id, string name, int age, double salary) {
+        root = insertNode(root, id, name, age, salary);
+    }
+
+    // Search Employee
+    void search(int id) {
+        Node* node = searchNode(root, id);
+        if (node) {
+            cout << "Employee found: ID: " << node->emp_id << ", Name: " << node->name
+                 << ", Age: " << node->age << ", Salary: " << node->salary << endl;
+        } else {
+            cout << "Employee not found.\n";
+        }
+    }
+
+    // Update Employee
+    void update(int id, string name, int age, double salary) {
+        updateNode(root, id, name, age, salary);
+    }
+
+    // Delete Employee
+    void deleteEmployee(int id) {
+        int caseType;
+        cout << "Choose the case for deletion:\n";
+        cout << "1. Leaf Node (No Children)\n";
+        cout << "2. One Subtree (Only One Child)\n";
+        cout << "3. Two Subtrees (Two Children)\n";
+        cout << "Enter your choice (1-3): ";
+        cin >> caseType;
+        root = deleteNode(root, id, caseType);
+    }
+
+    // Get Tree Height
+    void getHeight() {
+        cout << "Tree Height: " << height(root) << endl;
+    }
+
+    // Get Depth of a Node
+    void getDepth(int id) {
+        int d = depth(root, id, 0);
+        if (d == -1)
+            cout << "Employee not found.\n";
+        else
+            cout << "Depth of Employee ID " << id << ": " << d << endl;
+    }
+
+    // Count Leaves
+    void countLeaves() {
+        cout << "Total Leaves: " << countLeaves(root) << endl;
+    }
+
+    // Find Largest and Smallest Leaf
+    void findLargestAndSmallestLeaf() {
+        Node* largest = findLargestLeaf(root);
+        Node* smallest = findSmallestLeaf(root);
+
+        if (largest)
+            cout << "Largest Leaf: ID: " << largest->emp_id << ", Name: " << largest->name << endl;
+        if (smallest)
+            cout << "Smallest Leaf: ID: " << smallest->emp_id << ", Name: " << smallest->name << endl;
+    }
+
+    // Display All Employees
+    void displayAll() {
+        if (!root)
+            cout << "Tree is empty.\n";
+        else
+            inorder(root);
+    }
+};
+
+// Main Function
+int main() {
+    EmployeeTree tree;
+    int choice;
+
+    do {
+        cout << "\n1. Insert Employee\n2. Search Employee\n3. Update Employee\n4. Delete Employee\n";
+        cout << "5. Get Tree Height\n6. Get Depth of Node\n7. Count Leaves\n8. Find Largest and Smallest Leaf\n";
+        cout << "9. Display All Employees\n10. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1: {
+            int id, age;
+            double salary;
+            string name;
+            cout << "Enter Employee ID: ";
+            cin >> id;
+            cin.ignore();
+            cout << "Enter Employee Name: ";
+            getline(cin, name);
+            cout << "Enter Employee Age: ";
+            cin >> age;
+            cout << "Enter Employee Salary: ";
+            cin >> salary;
+            tree.insert(id, name, age, salary);
+            break;
+        }
+        case 2: {
+            int id;
+            cout << "Enter Employee ID to search: ";
+            cin >> id;
+            tree.search(id);
+            break;
+        }
+        case 3: {
+            int id, age;
+            double salary;
+            string name;
+            cout << "Enter Employee ID to update: ";
+            cin >> id;
+            cin.ignore();
+            cout << "Enter new Name: ";
+            getline(cin, name);
+            cout << "Enter new Age: ";
+            cin >> age;
+            cout << "Enter new Salary: ";
+            cin >> salary;
+            tree.update(id, name, age, salary);
+            break;
+        }
+        case 4: {
+            int id;
+            cout << "Enter Employee ID to delete: ";
+            cin >> id;
+            tree.deleteEmployee(id);
+            break;
+        }
+        case 5:
+            tree.getHeight();
+            break;
+        case 6: {
+            int id;
+            cout << "Enter Employee ID to find depth: ";
+            cin >> id;
+            tree.getDepth(id);
+            break;
+        }
+        case 7:
+            tree.countLeaves();
+            break;
+        case 8:
+            tree.findLargestAndSmallestLeaf();
+            break;
+        case 9:
+            tree.displayAll();
+            break;
+        case 10:
+            cout << "Exiting...\n";
+            break;
+        default:
+            cout << "Invalid choice! Try again.\n";
+        }
+    } while (choice != 10);
+
+    return 0;
+}
